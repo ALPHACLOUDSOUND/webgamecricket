@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 from telegram import Bot
 import os
 
+TELEGRAM_BOT_TOKEN= "7294713269:AAFwKEXMbLFMwKMDe6likn7NEbKEuLbVtxE"
+TELEGRAM_CHAT_ID= '-1002070732383'
+
 # Load environment variables from .env file
 load_dotenv()
 
