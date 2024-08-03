@@ -30,8 +30,10 @@ class Player(db.Model):
     username = db.Column(db.String(100), nullable=False)
     team = db.Column(db.String(50), nullable=False)
 
-with app.app_context():
-    db.create_all()
+@app.before_first_request
+def create_tables():
+    with app.app_context():
+        db.create_all()
 
 @app.route('/')
 def index():
