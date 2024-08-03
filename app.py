@@ -5,9 +5,6 @@ from dotenv import load_dotenv
 from telegram import Bot
 import os
 
-TELEGRAM_BOT_TOKEN= "7294713269:AAFwKEXMbLFMwKMDe6likn7NEbKEuLbVtxE"
-TELEGRAM_CHAT_ID= '-1002070732383'
-
 # Load environment variables from .env file
 load_dotenv()
 
@@ -33,7 +30,8 @@ class Player(db.Model):
     username = db.Column(db.String(100), nullable=False)
     team = db.Column(db.String(50), nullable=False)
 
-db.create_all()
+with app.app_context():
+    db.create_all()
 
 @app.route('/')
 def index():
