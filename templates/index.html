@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cricket Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <style>
+        body {
+            background-color: #282828;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        .login {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .game {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        input, button {
+            background-color: #282828;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 10px;
+            margin: 5px;
+        }
+        .field {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ffffff;
+            position: relative;
+        }
+        .player {
+            width: 50px;
+            height: 50px;
+            background-color: #00ff00;
+            position: absolute;
+        }
+        .ball {
+            width: 20px;
+            height: 20px;
+            background-color: #ff0000;
+            position: absolute;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cricket Game</h1>
+        <div class="login">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Telegram Username" required>
+            <button id="loginBtn">Login</button>
+        </div>
+        <div class="game">
+            <h2>Welcome to the Cricket Game</h2>
+            <p id="playerName"></p>
+            <div id="field" class="field"></div>
+            <div>
+                <button id="batBtn">Bat</button>
+                <button id="bowlBtn">Bowl</button>
+            </div>
+            <p id="score"></p>
+        </div>
+    </div>
+    <script>
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            const username = document.getElementById('username').value;
+            fetch('/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({username: username})
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.status === 'success') {
+                      document.querySelector('.login').style.display = 'none';
+                      document.querySelector('.game').style.display = 'block';
+                      document.getElementById('playerName').innerText = `Welcome, ${username}`;
+                      socket.emit('join', {username: username, team: 'A'});
+                  } else {
+                      alert('Verification failed. Please make sure you are a member of the Telegram group.');
+                  }
+              });
+        });
+
+        var socket = io();
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        document.getElementById('batBtn').addEventListener('click', function() {
+            socket.emit('bat', {team: 'A'});
+        });
+
+        document.getElementById('bowlBtn').addEventListener('click', function() {
+            socket.emit('bowl', {team: 'B'});
+        });
+
+        socket.on('player_joined', (data) => {
+            console.log(`${data.username} joined team ${data.team}`);
+        });
+
+        socket.on('score_update', (data) => {
+            document.getElementById('score').innerText = `Team ${data.team} scored. New score: ${data.score}`;
+        });
+
+        socket.on('bat', (data) => {
+            const ball = document.createElement('div');
+            ball.classList.add('ball');
+            ball.style.left = '50%';
+            ball.style.top = '90%';
+            document.getElementById('field').appendChild(ball);
+            // Implement ball movement
+        });
+
+        socket.on('bowl', (data) => {
+            const ball = document.createElement('div');
+            ball.classList.add('ball');
+            ball.style.left = '50%';
+            ball.style.top = '10%';
+            document.getElementById('field').appendChild(ball);
+            // Implement ball movement
+        });
+    </script>
+</body>
+</html>
